@@ -1,5 +1,6 @@
 ﻿using System;
 using MailKit.Net.Smtp;
+using MailKit.Security;
 using Services.Interface;
 
 namespace Services.Concrete
@@ -16,10 +17,9 @@ namespace Services.Concrete
                 // For demo-purposes, accept all SSL certificates (in case the server supports STARTTLS)
                 client.ServerCertificateValidationCallback = (s, c, h, e) => true;
 
-                client.Connect("smtp.friends.com", 587, false);
+                client.Connect ("smtp.gmail.com", 465, SecureSocketOptions.SslOnConnect);
 
-                // Note: only needed if the SMTP server requires authentication
-                client.Authenticate("joey", "password");
+                client.Authenticate("rekinyprogramowania@gmail.com", "rekprog12345");
 
                 client.Send(_emailService.Value.PrepareEmail());
                 client.Disconnect(true);
