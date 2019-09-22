@@ -1,6 +1,7 @@
 ﻿using System;
+using Services.Interface;
 
-namespace App
+namespace Services.Concrete
 {
     public class SpamService : ISpamService
     {

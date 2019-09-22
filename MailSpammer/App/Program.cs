@@ -1,8 +1,9 @@
 ﻿using System;
-using App.Interfaces;
 using App.Utils;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
+using Services.Concrete;
+using Services.Interface;
 
 namespace App
 {

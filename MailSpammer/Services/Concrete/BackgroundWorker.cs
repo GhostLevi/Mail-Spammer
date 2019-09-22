@@ -1,7 +1,6 @@
-﻿
-using App.Interfaces;
+﻿using Services.Interface;
 
-namespace App
+namespace Services.Concrete
 {
     public class BackgroundWorker : IBackgroundWorker
     {

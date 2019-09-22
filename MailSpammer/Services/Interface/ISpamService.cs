@@ -1,4 +1,4 @@
-﻿namespace App
+﻿namespace Services.Interface
 {
     public interface ISpamService
     {
