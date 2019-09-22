@@ -1,4 +1,6 @@
 ﻿
+using App.Interfaces;
+
 namespace App
 {
     public class BackgroundWorker : IBackgroundWorker

@@ -1,4 +1,4 @@
-﻿namespace App
+﻿namespace App.Interfaces
 {
     public interface IBackgroundWorker
     {

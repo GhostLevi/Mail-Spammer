@@ -1,8 +1,12 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System;
+using App.Interfaces;
+using App.Utils;
+using Microsoft.Extensions.DependencyInjection;
+using Serilog;
 
 namespace App
 {
-    class Program
+    internal static class Program
     {
         static void Main(string[] args)
         {
@@ -10,10 +14,19 @@ namespace App
                 .AddSingleton<ISpamService, SpamService>()
                 .AddSingleton<IBackgroundWorker, BackgroundWorker>()
                 .BuildServiceProvider();
-
-            var bgWorker = serviceProvider.GetService<IBackgroundWorker>();
             
-            bgWorker.DoWork();
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Debug()
+                .WriteTo.Console()
+                .WriteTo.File($"logs\\mail-spammer-log-{DateTime.Now}.txt", rollingInterval: RollingInterval.Day)
+                .CreateLogger();
+            
+            AppServiceProvider.Init(serviceProvider);
+
+            AppLogger.Information("APPLICATION INITIALIZED");
+
+            var root = new Root();
+            root.Run();
         }
     }
 }
