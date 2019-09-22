@@ -2,6 +2,7 @@
 using MailKit.Net.Smtp;
 using MailKit.Security;
 using Services.Interface;
+using Services.Utils;
 
 namespace Services.Concrete
 {
