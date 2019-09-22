@@ -12,7 +12,7 @@ namespace Services.Concrete
 
         public void DoWork()
         {
-            _spammer.SendMails();
+            _spammer.SendMail();
         }
     }
 }

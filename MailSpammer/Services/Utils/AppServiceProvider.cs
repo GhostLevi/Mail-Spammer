@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-namespace App.Utils
+namespace Services
 {
     public static class AppServiceProvider
     {

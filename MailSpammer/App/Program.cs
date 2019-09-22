@@ -1,7 +1,7 @@
 ﻿using System;
-using App.Utils;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
+using Services;
 using Services.Concrete;
 using Services.Interface;
 
@@ -14,6 +14,7 @@ namespace App
             var serviceProvider = new ServiceCollection()
                 .AddSingleton<ISpamService, SpamService>()
                 .AddSingleton<IBackgroundWorker, BackgroundWorker>()
+                .AddSingleton<IEmailService, EmailService>()
                 .BuildServiceProvider();
             
             Log.Logger = new LoggerConfiguration()
