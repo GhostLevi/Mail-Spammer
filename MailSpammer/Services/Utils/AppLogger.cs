@@ -1,7 +1,7 @@
 ﻿using System;
 using Serilog;
 
-namespace App
+namespace Services.Utils
 {
     public static class AppLogger
     {

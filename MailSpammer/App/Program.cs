@@ -1,9 +1,12 @@
 ﻿using System;
+using System.IO;
+using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Services;
 using Services.Concrete;
 using Services.Interface;
+using Services.Utils;
 
 namespace App
 {
@@ -12,9 +15,8 @@ namespace App
         static void Main(string[] args)
         {
             var serviceProvider = new ServiceCollection()
-                .AddSingleton<ISpamService, SpamService>()
-                .AddSingleton<IBackgroundWorker, BackgroundWorker>()
                 .AddSingleton<IEmailService, EmailService>()
+                .AddTransient<ICsvService,CsvService>()
                 .BuildServiceProvider();
             
             Log.Logger = new LoggerConfiguration()
@@ -29,6 +31,8 @@ namespace App
 
             var root = new Root();
             root.Run();
+
+            Console.WriteLine();
         }
     }
 }

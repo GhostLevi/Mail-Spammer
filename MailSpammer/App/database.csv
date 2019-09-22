@@ -1,4 +1,4 @@
-seq,name/first,name/last,gender,pick,email	
+Id,FirstName,LastName,Gender,CarBrand,Email	
 1,Jennie,Manning,Female,volkswagen,ziihaz@zekvajem.vi
 2,Elijah,Conner,Female,renault,kowot@fuic.cv
 3,Bobby,Tran,Female,skoda,zez@vocpebi.bo

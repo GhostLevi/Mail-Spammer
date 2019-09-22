@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace App.Utils
+namespace Services.Utils
 {
     public class ValueOperationResult<TValue>
     {
