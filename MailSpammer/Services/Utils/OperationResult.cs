@@ -1,13 +1,19 @@
 ﻿using System;
 
-namespace App.Utils
+namespace Services.Utils
 {
     public class OperationResult
     {
-        private OperationResult() { }
+        private OperationResult()
+        {
+        }
 
-        public class Success : OperationResult { }
+        public class Success : OperationResult
+        {
+        }
 
-        public class Failure : OperationResult { }
+        public class Failure : OperationResult
+        {
+        }
     }
 }

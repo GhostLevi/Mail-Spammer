@@ -2,11 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
 using CsvHelper;
 using Model;
 using Services.Interface;
@@ -16,7 +13,7 @@ namespace Services.Concrete
 {
     public class CsvService : ICsvService
     {
-        public IObservable<ValueOperationResult<IEnumerable<Person>>> prepareData()
+        public IObservable<ValueOperationResult<IEnumerable<Person>>> PrepareData()
         {
             return Observable.Create<ValueOperationResult<IEnumerable<Person>>>(
                 (IObserver<ValueOperationResult<IEnumerable<Person>>> observer) =>
@@ -31,7 +28,6 @@ namespace Services.Concrete
                             csv.Configuration.RegisterClassMap<CsvPersonMapper>();
                             var records = csv.GetRecords<Person>().ToList();
                             observer.OnNext(new ValueOperationResult<IEnumerable<Person>>.Success(records));
-                            observer.OnCompleted();
                         }
                     }
                     catch (Exception e)
@@ -40,6 +36,8 @@ namespace Services.Concrete
                         AppLogger.Error(e.Message);
                     }
                     
+                    observer.OnCompleted();
+
                     return Disposable.Empty;
                 });
         }

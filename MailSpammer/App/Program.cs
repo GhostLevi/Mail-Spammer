@@ -29,8 +29,8 @@ namespace App
 
             AppLogger.Information("APPLICATION INITIALIZED");
 
-            var root = new Root();
-            root.Run();
+            var worker = new BackgroundWorker();
+            worker.Run();
 
             Console.WriteLine();
         }

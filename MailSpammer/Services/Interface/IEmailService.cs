@@ -1,9 +1,11 @@
-﻿using MimeKit;
+﻿using System;
+using Model;
+using Services.Utils;
 
 namespace Services.Interface
 {
     public interface IEmailService
     {
-        MimeMessage PrepareEmail();
+        IObservable<OperationResult> SendEmail(Person personData);
     }
 }
