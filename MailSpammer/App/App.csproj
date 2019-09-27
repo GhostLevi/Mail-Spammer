@@ -15,4 +15,10 @@
       <ProjectReference Include="..\Services\Services.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Update="database.csv">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
 </Project>

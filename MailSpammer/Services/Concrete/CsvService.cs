@@ -20,7 +20,7 @@ namespace Services.Concrete
                 {
                     try
                     {
-                        using (var reader = new StreamReader(@"../../../database.csv"))
+                        using (var reader = new StreamReader(@"database.csv"))
                         using (var csv = new CsvReader(reader))
                         {
                             csv.Configuration.Delimiter = ",";
