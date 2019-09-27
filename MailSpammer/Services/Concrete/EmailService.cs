@@ -24,17 +24,17 @@ namespace Services.Concrete
                         using (var client = new SmtpClient())
                         {
                             // For demo-purposes, accept all SSL certificates (in case the server supports STARTTLS)
-                            client.ServerCertificateValidationCallback = (s, c, h, e) => true;
-
-                            client.Connect("smtp.gmail.com", 465, SecureSocketOptions.SslOnConnect);
-
-                            client.Authenticate("rekinyprogramowania@gmail.com", "rekprog12345");
-
-                            client.Send(PrepareEmail(personData));
-                            
-                            client.Disconnect(true);
-
-                            observer.OnNext(new OperationResult.Success());
+//                            client.ServerCertificateValidationCallback = (s, c, h, e) => true;
+//
+//                            client.Connect("smtp.gmail.com", 465, SecureSocketOptions.SslOnConnect);
+//
+//                            client.Authenticate("rekinyprogramowania@gmail.com", "rekprog12345");
+//
+//                            client.Send(PrepareEmail(personData));
+//                            
+//                            client.Disconnect(true);
+//
+//                            observer.OnNext(new OperationResult.Success());
                             
                             AppLogger.Information($"Email has been sent to {personData.Email}");
                         }

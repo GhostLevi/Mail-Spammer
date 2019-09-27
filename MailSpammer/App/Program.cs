@@ -3,6 +3,7 @@ using System.IO;
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
+using Serilog.Core;
 using Services;
 using Services.Concrete;
 using Services.Interface;
@@ -20,19 +21,18 @@ namespace App
                 .BuildServiceProvider();
             
             Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Debug()
                 .WriteTo.Console()
-                .WriteTo.File($"logs\\mail-spammer-log-{DateTime.Now}.txt", rollingInterval: RollingInterval.Day)
+                .WriteTo.Async(c=>c.File(@"mail-spammer-log.txt", rollingInterval: RollingInterval.Day))
                 .CreateLogger();
             
             AppServiceProvider.Init(serviceProvider);
 
-            AppLogger.Information("APPLICATION INITIALIZED");
+            AppLogger.Information($"APPLICATION INITIALIZED {DateTime.Now}");
 
             var worker = new BackgroundWorker();
             worker.Run();
 
-            Console.WriteLine();
+            Log.CloseAndFlush();
         }
     }
 }
