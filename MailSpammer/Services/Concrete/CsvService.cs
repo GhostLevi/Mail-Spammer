@@ -16,30 +16,37 @@ namespace Services.Concrete
         public IObservable<ValueOperationResult<IEnumerable<Person>>> PrepareData()
         {
             return Observable.Create<ValueOperationResult<IEnumerable<Person>>>(
-                (IObserver<ValueOperationResult<IEnumerable<Person>>> observer) =>
+                observer =>
                 {
                     try
                     {
-                        using (var reader = new StreamReader(@"database.csv"))
-                        using (var csv = new CsvReader(reader))
-                        {
-                            csv.Configuration.Delimiter = ",";
-                            csv.Configuration.PrepareHeaderForMatch = (header, index) => header.ToLower();
-                            csv.Configuration.RegisterClassMap<CsvPersonMapper>();
-                            var records = csv.GetRecords<Person>().ToList();
-                            observer.OnNext(new ValueOperationResult<IEnumerable<Person>>.Success(records));
-                        }
+                        var records = GetRecords(@"database.csv");
+                        observer.OnNext(new ValueOperationResult<IEnumerable<Person>>.Success(records));
                     }
                     catch (Exception e)
                     {
                         observer.OnError(e);
                         AppLogger.Error(e.Message);
                     }
-                    
-                    observer.OnCompleted();
+                    finally
+                    {
+                        observer.OnCompleted();
+                    }
 
                     return Disposable.Empty;
                 });
+        }
+
+        private List<Person> GetRecords(string path)
+        {
+            using (var reader = new StreamReader(path))
+            using (var csv = new CsvReader(reader))
+            {
+                csv.Configuration.Delimiter = ",";
+                csv.Configuration.PrepareHeaderForMatch = (header, index) => header.ToLower();
+                csv.Configuration.RegisterClassMap<CsvPersonMapper>();
+                return csv.GetRecords<Person>().ToList();
+            }
         }
     }
 }
