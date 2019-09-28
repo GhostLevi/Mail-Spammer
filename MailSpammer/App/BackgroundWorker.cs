@@ -29,8 +29,14 @@ namespace App
                         return list.Value.ToList().ToObservable().Buffer(100)
                             .Select(people =>
                             {
-                                return people.Select(person => _emailService.Value.SendEmail(person))
-                                    .Concat().Concat(Observable.Timer(TimeSpan.FromSeconds(5)).Select(x=>new OperationResult.Success()));
+                                var timer = Observable.Timer(TimeSpan.FromSeconds(5));
+
+                                var sending = people.Select(person => _emailService.Value.SendEmail(person)).Concat();
+
+                                return timer.Zip(sending, (time, result) => { return new OperationResult.Success(); });
+
+                                //return people.Select(person => _emailService.Value.SendEmail(person))
+                                //    .Concat().Concat(Observable.Timer(TimeSpan.FromSeconds(5)).Select(x=>new OperationResult.Success()));
                             }).Switch();
                     }
                     return Observable.Return(new OperationResult.Failure() as OperationResult);
