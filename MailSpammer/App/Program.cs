@@ -1,10 +1,6 @@
 ﻿using System;
-using System.IO;
-using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
-using Serilog.Core;
-using Services;
 using Services.Concrete;
 using Services.Interface;
 using Services.Utils;
