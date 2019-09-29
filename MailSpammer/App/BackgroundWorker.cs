@@ -28,7 +28,7 @@ namespace App
 
         public void Run()
         {
-            var disposable = _csvService.GetCollection()
+            var disposable = _csvService.GetCollectionFromFile(@"database.csv")
                 .Select(job =>
                 {
                     if (job is ValueOperationResult<IEnumerable<Person>>.Success list)

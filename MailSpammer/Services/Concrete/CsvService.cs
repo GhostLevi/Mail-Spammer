@@ -13,14 +13,14 @@ namespace Services.Concrete
 {
     public class CsvService : ICsvService
     {
-        public IObservable<ValueOperationResult<IEnumerable<Person>>> GetCollection()
+        public IObservable<ValueOperationResult<IEnumerable<Person>>> GetCollectionFromFile(string filePath)
         {
             return Observable.Create<ValueOperationResult<IEnumerable<Person>>>(
                 observer =>
                 {
                     try
                     {
-                        var records = GetRecords(@"database.csv");
+                        var records = GetRecords(filePath);
                         observer.OnNext(new ValueOperationResult<IEnumerable<Person>>.Success(records));
                     }
                     catch (Exception e)
