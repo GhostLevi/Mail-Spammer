@@ -13,14 +13,14 @@ namespace Services.Concrete
 {
     public class CsvService : ICsvService
     {
-        public IObservable<ValueOperationResult<IEnumerable<Person>>> PrepareData()
+        public IObservable<ValueOperationResult<IEnumerable<Person>>> GetCollectionFromFile(string filePath)
         {
             return Observable.Create<ValueOperationResult<IEnumerable<Person>>>(
                 observer =>
                 {
                     try
                     {
-                        var records = GetRecords(@"database.csv");
+                        var records = GetRecords(filePath);
                         observer.OnNext(new ValueOperationResult<IEnumerable<Person>>.Success(records));
                     }
                     catch (Exception e)
@@ -37,7 +37,7 @@ namespace Services.Concrete
                 });
         }
 
-        private List<Person> GetRecords(string path)
+        private IEnumerable<Person> GetRecords(string path)
         {
             using (var reader = new StreamReader(path))
             using (var csv = new CsvReader(reader))
@@ -45,7 +45,7 @@ namespace Services.Concrete
                 csv.Configuration.Delimiter = ",";
                 csv.Configuration.PrepareHeaderForMatch = (header, index) => header.ToLower();
                 csv.Configuration.RegisterClassMap<CsvPersonMapper>();
-                return csv.GetRecords<Person>().ToList();
+                return csv.GetRecords<Person>();
             }
         }
     }

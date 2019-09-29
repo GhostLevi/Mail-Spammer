@@ -24,6 +24,7 @@ namespace App
                 .AddTransient<ICsvService,CsvService>()
                 .AddSingleton<EmailGenerator>()
                 .Configure<SmtpConfig>(config.GetSection("smtpConfig"))
+                .AddSingleton<BackgroundWorker>()
                 .BuildServiceProvider();
             
             
@@ -33,11 +34,9 @@ namespace App
                 .WriteTo.Async(c=>c.File(@"mail-spammer-log.txt", rollingInterval: RollingInterval.Day))
                 .CreateLogger();
             
-            AppServiceProvider.Init(serviceProvider);
-
             AppLogger.Information($"APPLICATION INITIALIZED {DateTime.Now}");
 
-            var worker = new BackgroundWorker();
+            var worker = serviceProvider.GetService<BackgroundWorker>();
             worker.Run();
 
             Log.CloseAndFlush();
