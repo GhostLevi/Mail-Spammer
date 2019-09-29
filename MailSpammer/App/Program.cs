@@ -18,22 +18,22 @@ namespace App
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", optional: true);
             var config = configBuilder.Build();
-            
+
             var serviceProvider = new ServiceCollection()
                 .AddSingleton<ISmtpService, SmtpService>()
-                .AddTransient<ICsvService,CsvService>()
-                .AddSingleton<EmailGenerator>()
-                .Configure<SmtpConfig>(config.GetSection("smtpConfig"))
+                .AddTransient<ICsvService, CsvService>()
+                .AddSingleton<IEmailGenerator, EmailGenerator>()
                 .AddSingleton<BackgroundWorker>()
+
+                .Configure<SmtpConfig>(config.GetSection("smtpConfig"))
                 .BuildServiceProvider();
-            
             
             
             Log.Logger = new LoggerConfiguration()
                 .WriteTo.Console()
-                .WriteTo.Async(c=>c.File(@"mail-spammer-log.txt", rollingInterval: RollingInterval.Day))
+                .WriteTo.Async(c => c.File(@"mail-spammer-log.txt", rollingInterval: RollingInterval.Day))
                 .CreateLogger();
-            
+
             AppLogger.Information($"APPLICATION INITIALIZED {DateTime.Now}");
 
             var worker = serviceProvider.GetService<BackgroundWorker>();

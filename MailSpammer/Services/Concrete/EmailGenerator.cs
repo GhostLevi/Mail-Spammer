@@ -1,33 +1,46 @@
-﻿using MimeKit;
+﻿using System.Threading.Tasks;
+using FluentEmail.Core;
+using Microsoft.Extensions.Options;
 using Model;
+using Services.Interface;
 
 namespace Services.Concrete
 {
-    public class EmailGenerator
+    public class EmailGenerator : IEmailGenerator
     {
-        private MimeMessage GenerateEmail(Person personData)
+        private readonly SmtpConfig _smtpConfig;
+
+        public EmailGenerator(IOptions<SmtpConfig> smtpConfig)
         {
-            var message = new MimeMessage();
-            message.From.Add(new MailboxAddress("Rekiny", "rekinyprogramowania@gmail.com"));
-            message.To.Add(new MailboxAddress($"{personData.FirstName} {personData.LastName}", personData.Email));
+            _smtpConfig = smtpConfig.Value;
+        }
 
-            message.Subject = $"New {personData.CarBrand} car deals!";
+        public Task<IFluentEmail> GenerateEmail(Person personData)
+        {
+            var subject = $"New {personData.CarBrand} car deals!";
 
-            var prefix = personData.Gender is Gender.Male ? "Mr." : "Ms.";
+            var body = PrepareBody(personData).Result;
 
-            message.Body = new TextPart("plain")
-            {
-                Text = $@"Dear {personData.FirstName} {personData.LastName},
+            var mail = Email.From(_smtpConfig.Username)
+                .To(personData.Email)
+                .Subject(subject)
+                .Body(body);
+
+            return Task.FromResult(mail);
+        }
+
+        private Task<string> PrepareBody(Person personData)
+        {
+            var body = $@"Dear {personData.FirstName} {personData.LastName},
 
 Do you know that {personData.CarBrand} has new deals on 2019 car models?
 
 Check it at http://www.{personData.CarBrand}.com
 
 Best regards,
-Sales Representative of {personData.CarBrand}"
-            };
+Sales Representative of {personData.CarBrand}";
 
-            return message;
+            return Task.FromResult(body);
         }
     }
 }
