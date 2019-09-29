@@ -18,8 +18,8 @@ namespace App
         private readonly Lazy<ICsvService> _csvService =
             new Lazy<ICsvService>(AppServiceProvider.Get<ICsvService>());
 
-        private readonly Lazy<IEmailService> _emailService =
-            new Lazy<IEmailService>(AppServiceProvider.Get<IEmailService>());
+        private readonly Lazy<ISmtpService> _emailService =
+            new Lazy<ISmtpService>(AppServiceProvider.Get<ISmtpService>());
 
         public void Run()
         {
@@ -28,18 +28,20 @@ namespace App
                 {
                     if (job is ValueOperationResult<IEnumerable<Person>>.Success list)
                     {
-                        return list.Value.ToList().ToObservable().Buffer(100)
+                        return list.Value.ToList().ToObservable().Buffer(10)
                             .Select(people =>
                             {
-                                var timer = Observable.Timer(TimeSpan.FromSeconds(60));
+                                var timer = Observable.Timer(TimeSpan.FromSeconds(20));
 
-                                var sending = people.Select(person => _emailService.Value.SendEmail(person)).Concat();
+                                var sending = people.Select(person =>
+                                        _emailService.Value.SendEmailsPackage(person).SubscribeOn(NewThreadScheduler.Default))
+                                    .Concat();
 
                                 return timer.Zip(sending, (time, result) => new OperationResult.Success());
                             }).Concat();
                     }
+
                     return Observable.Return(new OperationResult.Failure() as OperationResult);
-                    
                 }).Switch().Repeat();
 
             using (var handle = disposable.Subscribe(Console.WriteLine))

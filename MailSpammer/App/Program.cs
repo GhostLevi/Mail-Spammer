@@ -1,5 +1,8 @@
 ﻿using System;
+using System.IO;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Model;
 using Serilog;
 using Services.Concrete;
 using Services.Interface;
@@ -11,10 +14,19 @@ namespace App
     {
         static void Main(string[] args)
         {
+            var configBuilder = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: true);
+            var config = configBuilder.Build();
+            
             var serviceProvider = new ServiceCollection()
-                .AddSingleton<IEmailService, EmailService>()
+                .AddSingleton<ISmtpService, SmtpService>()
                 .AddTransient<ICsvService,CsvService>()
+                .AddSingleton<EmailGenerator>()
+                .Configure<SmtpConfig>(config.GetSection("smtpConfig"))
                 .BuildServiceProvider();
+            
+            
             
             Log.Logger = new LoggerConfiguration()
                 .WriteTo.Console()
