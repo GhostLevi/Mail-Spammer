@@ -19,7 +19,7 @@ namespace App
     {
         private readonly ICsvService _csvService;
         private readonly ISmtpService _smtpService;
-        
+
         public BackgroundWorker(ICsvService csvService, ISmtpService smtpService)
         {
             _csvService = csvService;
@@ -33,15 +33,14 @@ namespace App
                 {
                     if (job is ValueOperationResult<IEnumerable<Person>>.Success list)
                     {
-                        return list.Value.ToList().ToObservable().Buffer(10)
+                        return list.Value.ToList().ToObservable().Buffer(5)
                             .Select(people =>
                             {
-                                var timer = Observable.Timer(TimeSpan.FromSeconds(20));
-                                
+                                var timer = Observable.Timer(TimeSpan.FromSeconds(2));
+
                                 var sending = people.Select(person => _smtpService.SendEmail(person)).Concat();
 
                                 return timer.Zip(sending, (time, result) => new OperationResult.Success());
-                                
                             }).Concat();
                     }
 

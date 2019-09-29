@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Net.Mail;
+using System.Threading.Tasks;
 using FluentEmail.Core;
 using Microsoft.Extensions.Options;
 using Model;
@@ -15,23 +16,22 @@ namespace Services.Concrete
             _smtpConfig = smtpConfig.Value;
         }
 
-        public Task<IFluentEmail> GenerateEmail(Person personData)
+        public Task<MailMessage> GenerateEmail(Person personData)
         {
             var subject = $"New {personData.CarBrand} car deals!";
 
             var body = PrepareBody(personData).Result;
 
-            var mail = Email.From(_smtpConfig.Username)
-                .To(personData.Email)
-                .Subject(subject)
-                .Body(body);
+            var mail = new MailMessage(_smtpConfig.Username, personData.Email, subject, body);
 
             return Task.FromResult(mail);
         }
 
         private Task<string> PrepareBody(Person personData)
         {
-            var body = $@"Dear {personData.FirstName} {personData.LastName},
+            var prefix = personData.Gender == Gender.Male ? "Mr." : "Ms.";
+
+            var body = $@"Dear {prefix} {personData.FirstName} {personData.LastName},
 
 Do you know that {personData.CarBrand} has new deals on 2019 car models?
 

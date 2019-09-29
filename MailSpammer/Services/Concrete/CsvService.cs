@@ -45,7 +45,7 @@ namespace Services.Concrete
                 csv.Configuration.Delimiter = ",";
                 csv.Configuration.PrepareHeaderForMatch = (header, index) => header.ToLower();
                 csv.Configuration.RegisterClassMap<CsvPersonMapper>();
-                return csv.GetRecords<Person>();
+                return csv.GetRecords<Person>().ToList();
             }
         }
     }

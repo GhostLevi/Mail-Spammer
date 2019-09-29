@@ -1,5 +1,9 @@
 ﻿using System;
 using System.IO;
+using System.Net;
+using System.Net.Mail;
+using FluentEmail.Core;
+using FluentEmail.Smtp;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Model;
@@ -16,19 +20,15 @@ namespace App
         {
             var configBuilder = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", optional: true);
+                .AddJsonFile(@"config/appsettings.json", optional: true);
             var config = configBuilder.Build();
-            
-            
+
             var serviceProvider = new ServiceCollection()
-                .Configure<SmtpConfig>(config.GetSection("smtpService"))
+                .Configure<SmtpConfig>(config.GetSection("smtpConfig"))
                 .AddSingleton<ISmtpService, SmtpService>()
-                .AddTransient<ICsvService, CsvService>()
+                .AddSingleton<ICsvService, CsvService>()
                 .AddSingleton<IEmailGenerator, EmailGenerator>()
                 .AddSingleton<BackgroundWorker>()
-                .AddFluentEmail("rekinyprogramowania@gmail.com")
-                .AddSmtpSender("smtp.gmail.com", 465,"rekinyprogramowania@gmail.com","rekprog12345")
-                .Services
                 .BuildServiceProvider();
 
 
