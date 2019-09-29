@@ -15,15 +15,18 @@ namespace App
 {
     public class BackgroundWorker
     {
-        private readonly Lazy<ICsvService> _csvService =
-            new Lazy<ICsvService>(AppServiceProvider.Get<ICsvService>());
+        private readonly ICsvService _csvService;
+        private readonly IEmailService _emailService;
 
-        private readonly Lazy<IEmailService> _emailService =
-            new Lazy<IEmailService>(AppServiceProvider.Get<IEmailService>());
+        public BackgroundWorker(ICsvService csvService, IEmailService emailService)
+        {
+            _csvService = csvService;
+            _emailService = emailService;
+        }
 
         public void Run()
         {
-            var disposable = _csvService.Value.PrepareData()
+            var disposable = _csvService.PrepareData()
                 .Select((job) =>
                 {
                     if (job is ValueOperationResult<IEnumerable<Person>>.Success list)
@@ -33,7 +36,7 @@ namespace App
                             {
                                 var timer = Observable.Timer(TimeSpan.FromSeconds(60));
 
-                                var sending = people.Select(person => _emailService.Value.SendEmail(person)).Concat();
+                                var sending = people.Select(person => _emailService.SendEmail(person)).Concat();
 
                                 return timer.Zip(sending, (time, result) => new OperationResult.Success());
                             }).Concat();
