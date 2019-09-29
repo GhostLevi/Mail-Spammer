@@ -7,6 +7,6 @@ namespace Services.Interface
 {
     public interface ICsvService
     {
-        IObservable<ValueOperationResult<IEnumerable<Person>>> PrepareData();
+        IObservable<ValueOperationResult<IEnumerable<Person>>> GetCollection();
     }
 }
