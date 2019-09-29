@@ -18,17 +18,20 @@ namespace App
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", optional: true);
             var config = configBuilder.Build();
-
+            
+            
             var serviceProvider = new ServiceCollection()
+                .Configure<SmtpConfig>(config.GetSection("smtpService"))
                 .AddSingleton<ISmtpService, SmtpService>()
                 .AddTransient<ICsvService, CsvService>()
                 .AddSingleton<IEmailGenerator, EmailGenerator>()
                 .AddSingleton<BackgroundWorker>()
-
-                .Configure<SmtpConfig>(config.GetSection("smtpConfig"))
+                .AddFluentEmail("rekinyprogramowania@gmail.com")
+                .AddSmtpSender("smtp.gmail.com", 465,"rekinyprogramowania@gmail.com","rekprog12345")
+                .Services
                 .BuildServiceProvider();
-            
-            
+
+
             Log.Logger = new LoggerConfiguration()
                 .WriteTo.Console()
                 .WriteTo.Async(c => c.File(@"mail-spammer-log.txt", rollingInterval: RollingInterval.Day))
