@@ -20,10 +20,10 @@ namespace App
         {
             var configBuilder = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile(@"config/appsettings.json", optional: true);
+                .AddJsonFile(@"config/appsettings.json", optional: true, reloadOnChange: true);
             var config = configBuilder.Build();
-
             var serviceProvider = new ServiceCollection()
+                .ConfigureWritable<SchedulerConfig>(config,"schedulerConfig")
                 .Configure<SmtpConfig>(config.GetSection("smtpConfig"))
                 .AddSingleton<ISmtpService, SmtpService>()
                 .AddSingleton<ICsvService, CsvService>()

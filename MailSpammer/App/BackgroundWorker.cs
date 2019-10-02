@@ -1,14 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Linq;
-using System.Reactive.Concurrency;
 using System.Reactive.Linq;
-using System.Reactive.Subjects;
-using System.Threading.Tasks;
-using System.Timers;
-using CsvHelper;
 using Model;
 using Services.Interface;
 using Services.Utils;
@@ -19,33 +12,34 @@ namespace App
     {
         private readonly ICsvService _csvService;
         private readonly ISmtpService _smtpService;
+        private readonly IWritableOptions<SchedulerConfig> _schedulerConfig;
 
-        public BackgroundWorker(ICsvService csvService, ISmtpService smtpService)
+        public BackgroundWorker(ICsvService csvService, ISmtpService smtpService,
+            IWritableOptions<SchedulerConfig> schedulerConfig)
         {
             _csvService = csvService;
             _smtpService = smtpService;
+            _schedulerConfig = schedulerConfig;
         }
 
         public void Run()
         {
-            var disposable = _csvService.GetCollectionFromFile(@"database.csv")
-                .Select(job =>
-                {
-                    if (job is ValueOperationResult<IEnumerable<Person>>.Success list)
+            var disposable =
+                _csvService.GetCollectionFromFile(@"database.csv")
+                    .Skip(_schedulerConfig.Value.StartingPoint)
+                    .Buffer(_schedulerConfig.Value.PackageSize)
+                    .Select(people =>
                     {
-                        return list.Value.ToList().ToObservable().Buffer(5)
-                            .Select(people =>
-                            {
-                                var timer = Observable.Timer(TimeSpan.FromSeconds(2));
+                        var timer = Observable.Timer(TimeSpan.FromSeconds(_schedulerConfig.Value.TimeLimit));
 
-                                var sending = people.Select(person => _smtpService.SendEmail(person)).Concat();
+                        var sending = people.Select(person => _smtpService.SendEmail(person)).Concat();
 
-                                return timer.Zip(sending, (time, result) => new OperationResult.Success());
-                            }).Concat();
-                    }
-
-                    return Observable.Return(new OperationResult.Failure() as OperationResult);
-                }).Switch().Repeat();
+                        return timer.Zip(sending, (time, result) => new OperationResult.Success())
+                            .Do(success => { }, (throwable) => { },
+                                () => { _schedulerConfig.Update(config => { config.StartingPoint += _schedulerConfig.Value.PackageSize; }); });
+                    })
+                    .Concat()
+                    .RepeatWhen(observable => observable.Delay(TimeSpan.FromSeconds(10)));
 
             using (disposable.Subscribe(Console.WriteLine))
             {

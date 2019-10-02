@@ -30,30 +30,35 @@ namespace Services.Concrete
             return Observable.Create<OperationResult>(
                 observer =>
                 {
-                    Task.Run(async () =>
+                    Task.Run( () =>
                     {
                         try
                         {
-                            using (var smtpClient = new SmtpClient(_smtpConfig.Host, _smtpConfig.Port)
-                            {
-                                EnableSsl = true,
-                                Credentials = new NetworkCredential(_smtpConfig.Username, _smtpConfig.Password)
-                            })
-                            {
-                                var mail = await _emailGenerator.GenerateEmail(personData);
+//                            using (var smtpClient = new SmtpClient(_smtpConfig.Host, _smtpConfig.Port)
+//                            {
+//                                EnableSsl = true,
+//                                Credentials = new NetworkCredential(_smtpConfig.Username, _smtpConfig.Password)
+//                            })
+//                            {
+//                                var mail = await _emailGenerator.GenerateEmail(personData);
+//                                
+//                                await smtpClient.SendMailAsync(mail);
+//                                
+//                                observer.OnNext(new OperationResult.Success());
+//
+//                                AppLogger.Information(
+//                                    $"Email has been sent to {mail.To.FirstOrDefault()?.Address}");
+//                            }
+                            
+                            observer.OnNext(new OperationResult.Success());
 
-                                observer.OnNext(new OperationResult.Success());
-
-                                AppLogger.Information(
-                                    $"Email has been sent to {mail.To.FirstOrDefault()?.Address}");
-                                await smtpClient.SendMailAsync(mail);
-                            }
+                            AppLogger.Information(
+                                $"Email has been sent to {personData.Email}");
                         }
                         catch (Exception e)
                         {
                             observer.OnError(e);
                             AppLogger.Error(e.Message);
-                            observer.OnNext(new OperationResult.Failure());
                         }
                     });
 

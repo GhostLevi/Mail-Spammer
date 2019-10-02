@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using CsvHelper;
@@ -13,15 +12,25 @@ namespace Services.Concrete
 {
     public class CsvService : ICsvService
     {
-        public IObservable<ValueOperationResult<IEnumerable<Person>>> GetCollectionFromFile(string filePath)
+        public IObservable<Person> GetCollectionFromFile(string filePath)
         {
-            return Observable.Create<ValueOperationResult<IEnumerable<Person>>>(
+            return Observable.Create<Person>(
                 observer =>
                 {
                     try
                     {
-                        var records = GetRecords(filePath);
-                        observer.OnNext(new ValueOperationResult<IEnumerable<Person>>.Success(records));
+                        using (var reader = new StreamReader(filePath))
+                        using (var csv = new CsvReader(reader))
+                        {
+                            csv.Configuration.Delimiter = ",";
+                            csv.Configuration.PrepareHeaderForMatch = (header, index) => header.ToLower();
+                            csv.Configuration.RegisterClassMap<CsvPersonMapper>();
+                            var records = csv.GetRecords<Person>();
+                            foreach (var person in records)
+                            {
+                                observer.OnNext(person);
+                            }
+                        }
                     }
                     catch (Exception e)
                     {
@@ -45,7 +54,12 @@ namespace Services.Concrete
                 csv.Configuration.Delimiter = ",";
                 csv.Configuration.PrepareHeaderForMatch = (header, index) => header.ToLower();
                 csv.Configuration.RegisterClassMap<CsvPersonMapper>();
-                return csv.GetRecords<Person>().ToList();
+                var collection = csv.GetRecords<Person>();
+                foreach (var item in collection)
+                {
+                    Console.WriteLine(item);
+                }
+                return csv.GetRecords<Person>();
             }
         }
     }
