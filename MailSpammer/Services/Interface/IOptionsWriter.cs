@@ -1,8 +1,7 @@
 ﻿using System;
-using Model;
 using Newtonsoft.Json.Linq;
 
-namespace Services.Utils
+namespace Services.Interface
 {
     interface IOptionsWriter
     {

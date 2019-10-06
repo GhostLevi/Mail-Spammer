@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.Extensions.Options;
 
-namespace Services.Utils
+namespace Services.Interface
 {
     public interface IWritableOptions<out T> : IOptions<T> where T : class, new()
     {

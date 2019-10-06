@@ -2,8 +2,9 @@
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Services.Interface;
 
-namespace Services.Utils
+namespace Services.Utils.optionsWriter
 {
     class WritableOptions<T> : IWritableOptions<T> where T : class, new()
     {

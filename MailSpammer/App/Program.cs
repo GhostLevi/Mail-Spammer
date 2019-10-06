@@ -21,7 +21,9 @@ namespace App
             var configBuilder = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile(@"config/appsettings.json", optional: true, reloadOnChange: true);
+            
             var config = configBuilder.Build();
+            
             var serviceProvider = new ServiceCollection()
                 .ConfigureWritable<SchedulerConfig>(config,"schedulerConfig")
                 .Configure<SmtpConfig>(config.GetSection("smtpConfig"))
@@ -30,10 +32,10 @@ namespace App
                 .AddSingleton<IEmailGenerator, EmailGenerator>()
                 .AddSingleton<BackgroundWorker>()
                 .BuildServiceProvider();
-
-
+            
             Log.Logger = new LoggerConfiguration()
-                .WriteTo.Console()
+                .MinimumLevel.Verbose()
+                .WriteTo.ColoredConsole()
                 .WriteTo.Async(c => c.File(@"mail-spammer-log.txt", rollingInterval: RollingInterval.Day))
                 .CreateLogger();
 

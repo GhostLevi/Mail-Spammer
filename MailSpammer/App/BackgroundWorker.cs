@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using Model;
 using Services.Interface;
@@ -24,24 +25,34 @@ namespace App
 
         public void Run()
         {
-            var disposable =
-                _csvService.GetCollectionFromFile(@"database.csv")
-                    .Skip(_schedulerConfig.Value.StartingPoint)
+            var disposable = Observable.Defer(() =>
+            {
+                AppLogger.Information("Checking for new data...");
+
+                return _csvService.GetCollectionFromFile(@"database.csv", _schedulerConfig.Value.StartingPoint)
                     .Buffer(_schedulerConfig.Value.PackageSize)
                     .Select(people =>
                     {
-                        var timer = Observable.Timer(TimeSpan.FromSeconds(_schedulerConfig.Value.TimeLimit));
-
-                        var sending = people.Select(person => _smtpService.SendEmail(person)).Concat();
+                        var timer = Observable.Timer(TimeSpan.FromSeconds(_schedulerConfig.Value.TimeLimit))
+                            .DoOnComplete(() => { AppLogger.Information($"Time limit have passed."); });
+                        
+                        var sending = people.Select(person => _smtpService.SendEmail(person))
+                            .Concat()
+                            .DoOnNext(_ => { _schedulerConfig.Update(config => { config.StartingPoint += 1; }); })
+                            .Buffer(people.Count)
+                            .DoOnComplete(() => { AppLogger.Information($"Package sent."); });
 
                         return timer.Zip(sending, (time, result) => new OperationResult.Success())
-                            .Do(success => { }, (throwable) => { },
-                                () => { _schedulerConfig.Update(config => { config.StartingPoint += _schedulerConfig.Value.PackageSize; }); });
+                            .DoOnComplete(() =>
+                            {
+                                AppLogger.Information(
+                                    $"{_schedulerConfig.Value.PackageSize} mails sent in max of {_schedulerConfig.Value.TimeLimit} seconds.");
+                            });
                     })
-                    .Concat()
-                    .RepeatWhen(observable => observable.Delay(TimeSpan.FromSeconds(10)));
+                    .Concat();
+            }).RepeatWhen(observable => observable.Delay(TimeSpan.FromSeconds(3)));
 
-            using (disposable.Subscribe(Console.WriteLine))
+            using (disposable.Subscribe())
             {
                 Console.Read();
             }

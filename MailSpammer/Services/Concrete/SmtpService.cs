@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Mail;
@@ -30,41 +31,43 @@ namespace Services.Concrete
             return Observable.Create<OperationResult>(
                 observer =>
                 {
-                    Task.Run( () =>
+                    return Task.Run(async () =>
                     {
                         try
                         {
-//                            using (var smtpClient = new SmtpClient(_smtpConfig.Host, _smtpConfig.Port)
-//                            {
-//                                EnableSsl = true,
-//                                Credentials = new NetworkCredential(_smtpConfig.Username, _smtpConfig.Password)
-//                            })
-//                            {
-//                                var mail = await _emailGenerator.GenerateEmail(personData);
-//                                
-//                                await smtpClient.SendMailAsync(mail);
-//                                
-//                                observer.OnNext(new OperationResult.Success());
-//
-//                                AppLogger.Information(
-//                                    $"Email has been sent to {mail.To.FirstOrDefault()?.Address}");
-//                            }
-                            
-                            observer.OnNext(new OperationResult.Success());
+                            using (var smtpClient = new SmtpClient(_smtpConfig.Host, _smtpConfig.Port)
+                            {
+                                EnableSsl = true,
+                                Credentials = new NetworkCredential(_smtpConfig.Username, _smtpConfig.Password)
+                            })
+                            {
+                                var mail = await _emailGenerator.GenerateEmail(personData);
 
-                            AppLogger.Information(
-                                $"Email has been sent to {personData.Email}");
+                                var stopWatch = Stopwatch.StartNew();
+
+                                await smtpClient.SendMailAsync(mail);
+
+                                
+                                observer.OnNext(new OperationResult.Success());
+
+                                AppLogger.Debug(
+                                    $"Id : {personData.Id} - Email has been sent to {personData.Email} in {stopWatch.Elapsed.TotalSeconds:0.000} seconds.");
+                            }
+
+//                            observer.OnNext(new OperationResult.Success());
+//
+//                            AppLogger.Debug(
+//                                $"Id : {personData.Id} - Email has been sent to {personData.Email}");
                         }
                         catch (Exception e)
                         {
                             observer.OnError(e);
                             AppLogger.Error(e.Message);
                         }
+
+                        observer.OnCompleted();
+                        return Disposable.Empty;
                     });
-
-                    observer.OnCompleted();
-
-                    return Disposable.Empty;
                 });
         }
     }

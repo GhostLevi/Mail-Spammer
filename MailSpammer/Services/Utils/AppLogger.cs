@@ -7,17 +7,22 @@ namespace Services.Utils
     {
         public static void Information(string info)
         {
-            Log.Information($":: MAIL SPAMMER INFORMATION :: {info}");
+            Log.Information($"{info}");
         }
 
+        public static void Debug(string text)
+        {
+            Log.Debug($"{text}");
+        }
+        
         public static void ErrorEx(Exception ex)
         {
-            Log.Error($":: MAIL SPAMMER ERROR :: An {ex.Message} has been thrown ");
+            Log.Error($"An {ex.Message} has been thrown ");
         }
 
-        public static void Error(string info)
+        public static void Error(string text)
         {
-            Log.Error($":: MAIL SPAMMER ERROR :: {info}");
+            Log.Error($"{text}");
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using CsvHelper;
@@ -12,7 +13,7 @@ namespace Services.Concrete
 {
     public class CsvService : ICsvService
     {
-        public IObservable<Person> GetCollectionFromFile(string filePath)
+        public IObservable<Person> GetCollectionFromFile(string filePath, int skip)
         {
             return Observable.Create<Person>(
                 observer =>
@@ -25,7 +26,7 @@ namespace Services.Concrete
                             csv.Configuration.Delimiter = ",";
                             csv.Configuration.PrepareHeaderForMatch = (header, index) => header.ToLower();
                             csv.Configuration.RegisterClassMap<CsvPersonMapper>();
-                            var records = csv.GetRecords<Person>();
+                            var records = csv.GetRecords<Person>().Skip(skip);
                             foreach (var person in records)
                             {
                                 observer.OnNext(person);
@@ -54,11 +55,6 @@ namespace Services.Concrete
                 csv.Configuration.Delimiter = ",";
                 csv.Configuration.PrepareHeaderForMatch = (header, index) => header.ToLower();
                 csv.Configuration.RegisterClassMap<CsvPersonMapper>();
-                var collection = csv.GetRecords<Person>();
-                foreach (var item in collection)
-                {
-                    Console.WriteLine(item);
-                }
                 return csv.GetRecords<Person>();
             }
         }
