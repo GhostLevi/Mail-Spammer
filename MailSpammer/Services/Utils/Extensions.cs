@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Services.Interface;
+using Services.Utils.OptionsWriter;
 
 namespace Services.Utils
 {
@@ -25,8 +26,7 @@ namespace Services.Utils
         {
             return source.Do((item) => { }, (throwable) => { }, onCompleted);
         }
-
-
+        
         public static IServiceCollection ConfigureWritable<T>(
             this IServiceCollection services,
             IConfigurationRoot configuration,
@@ -36,7 +36,7 @@ namespace Services.Utils
             services.AddTransient<IWritableOptions<T>>(provider =>
             {
                 var options = provider.GetService<IOptionsMonitor<T>>();
-                IOptionsWriter writer = new OptionsWriter(configuration);
+                IOptionsWriter writer = new OptionsWriter.OptionsWriter(configuration);
                 return new WritableOptions<T>(sectionName, writer, options);
             });
             return services;

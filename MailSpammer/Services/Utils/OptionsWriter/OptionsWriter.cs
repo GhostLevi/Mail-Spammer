@@ -1,13 +1,11 @@
 ﻿using System;
 using System.IO;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.FileProviders;
-using Model;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Services.Interface;
 
-namespace Services.Utils
+namespace Services.Utils.OptionsWriter
 {
     class OptionsWriter : IOptionsWriter
     {

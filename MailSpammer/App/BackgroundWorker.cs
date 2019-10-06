@@ -29,13 +29,15 @@ namespace App
             {
                 AppLogger.Information("Checking for new data...");
 
-                return _csvService.GetCollectionFromFile(@"database.csv", _schedulerConfig.Value.StartingPoint)
+                return _csvService
+                    .GetCollectionFromFile<Person, CsvPersonMapper>(@"database.csv",
+                        _schedulerConfig.Value.StartingPoint)
                     .Buffer(_schedulerConfig.Value.PackageSize)
                     .Select(people =>
                     {
                         var timer = Observable.Timer(TimeSpan.FromSeconds(_schedulerConfig.Value.TimeLimit))
                             .DoOnComplete(() => { AppLogger.Information($"Time limit have passed."); });
-                        
+
                         var sending = people.Select(person => _smtpService.SendEmail(person))
                             .Concat()
                             .DoOnNext(_ => { _schedulerConfig.Update(config => { config.StartingPoint += 1; }); })

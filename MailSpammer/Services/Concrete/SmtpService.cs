@@ -47,17 +47,11 @@ namespace Services.Concrete
 
                                 await smtpClient.SendMailAsync(mail);
 
-                                
                                 observer.OnNext(new OperationResult.Success());
 
                                 AppLogger.Debug(
                                     $"Id : {personData.Id} - Email has been sent to {personData.Email} in {stopWatch.Elapsed.TotalSeconds:0.000} seconds.");
                             }
-
-//                            observer.OnNext(new OperationResult.Success());
-//
-//                            AppLogger.Debug(
-//                                $"Id : {personData.Id} - Email has been sent to {personData.Email}");
                         }
                         catch (Exception e)
                         {

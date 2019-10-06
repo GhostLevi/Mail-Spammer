@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Services.Interface;
 
-namespace Services.Utils.optionsWriter
+namespace Services.Utils.OptionsWriter
 {
     class WritableOptions<T> : IWritableOptions<T> where T : class, new()
     {

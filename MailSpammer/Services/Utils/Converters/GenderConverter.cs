@@ -3,7 +3,7 @@ using CsvHelper.Configuration;
 using CsvHelper.TypeConversion;
 using Model;
 
-namespace Services.Utils
+namespace Services.Utils.Converters
 {
     public class GenderConverter : DefaultTypeConverter
     {
