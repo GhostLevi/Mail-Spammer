@@ -1,0 +1,13 @@
+dotnet publish -c Release
+
+docker build -t NAZWA -f Dockerfile .
+
+docker create --name NAZWA 
+
+docker ps -a
+
+docker run -dit --restart unless-stopped NAZWA
+
+docker stop NAZWA
+
+docker rm NAZWA
